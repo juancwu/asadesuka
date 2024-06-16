@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"flag"
 	"fmt"
 	"io"
 	"log"
@@ -184,6 +185,13 @@ func main() {
 	sunset, err := time.Parse(time.RFC3339, cache.Results.Sunset)
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	sunsetOffset := flag.Int("offset", 0, "Make sunset evaluation x minutes earlier than actual.")
+	flag.Parse()
+	if *sunsetOffset > 0 {
+		t := time.Minute * time.Duration(*sunsetOffset)
+		sunset = sunset.Add(-t)
 	}
 
 	if now.After(sunrise) && now.Before(sunset) {
